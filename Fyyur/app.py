@@ -32,14 +32,6 @@ migrate = Migrate(app, db)
   # Models.
 #----------------------------------------------------------------------------#
 
-# shows = db.Table('venue_listing',
-#   db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
-#   db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-#   db.Column('upcoming', db.Boolean),
-#   db.Column('start_time', db.String())
-# )
-
-
 class Venue(db.Model):
     __tablename__ = 'Venue'
     id = db.Column(db.Integer, primary_key=True)
@@ -114,7 +106,6 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  #data = db.session.query(Venue).join(Shows)
   now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
   venues = Venue.query.group_by(Venue.id, Venue.city, Venue.state).all()
   cur = ''
@@ -145,7 +136,6 @@ def search_venues():
   # search for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   results = Venue.query.filter(Venue.name.ilike('%' + request.form['search_term'] + '%'))
-  # print(like_venue)
   response={
     "count": results.count(),
     "data": results.all()
@@ -199,13 +189,6 @@ def create_venue_submission():
     phone = request.form['phone']
     facebook_link = request.form['facebook_link']
 
-    ''' 
-    website = request.form['website']
-    seeking_venue = request.form['seeking_venue']
-    seeking_description = request.form['seeking_description']
-    image_link = request.form['image_link']
-    '''
-    
     venue = Venue(name=name, genres=genres, city=city, state=state, address=address, 
     phone=phone, facebook_link=facebook_link)
 
@@ -303,35 +286,32 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  this = Artist.query.filter_by(id=artist_id).first()
-  artist={
-    "id": artist_id,
-    "name": this.name,
-    "genres": this.genres,
-    #"address": this.address,
-    "city": this.city,
-    "state": this.state,
-    "phone": this.phone,
-    "website": this.website,
-    "facebook_link": this.facebook_link,
-    "seeking_venue": this.seeking_venue,
-    "seeking_description": this.seeking_description,
-    "image_link": this.image_link
-  }
-  form.name.data = artist["name"]
-  form.genres.data = artist["genres"]
-  form.city.data = artist["city"]
-  form.state.data = artist["state"]
-  form.phone.data = artist["phone"]
-  form.facebook_link.data = artist["facebook_link"]
-  form.image_link.data = artist["image_link"]
-  
-  #form.website.data = artist["website"]
-  #form.seeking_venue.data = artist["seeking_venue"]
-  #form.seeking_description.data = artist["seeking_description"]
+  this = Artist.query.get(artist_id)
+  if this:
+    artist={
+      "id": artist_id,
+      "name": this.name,
+      "genres": this.genres,
+      "city": this.city,
+      "state": this.state,
+      "phone": this.phone,
+      "website": this.website,
+      "facebook_link": this.facebook_link,
+      "seeking_venue": this.seeking_venue,
+      "seeking_description": this.seeking_description,
+      "image_link": this.image_link
+    }
+    form.name.data = artist["name"]
+    form.genres.data = artist["genres"]
+    form.city.data = artist["city"]
+    form.state.data = artist["state"]
+    form.phone.data = artist["phone"]
+    form.facebook_link.data = artist["facebook_link"]
+    form.image_link.data = artist["image_link"]
 
-  # TODO: populate form with fields from artist with ID <artist_id>
-  return render_template('forms/edit_artist.html', form=form, artist=artist)
+    # TODO: populate form with fields from artist with ID <artist_id>
+    return render_template('forms/edit_artist.html', form=form, artist=artist)
+  return render_template()
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
@@ -349,11 +329,6 @@ def edit_artist_submission(artist_id):
     phone = request.form['phone']
     facebook_link = request.form['facebook_link']
     
-    #"website": request.form['website'],
-    #"seeking_venue": request.form['seeking_venue'],
-    #"seeking_description": request.form['seeking_description'],
-    #"image_link": request.form['image_link']
-
     artist = Artist(id=artist_id, name=name, genres=genres, city=city, state=state, phone=phone, 
       facebook_link=facebook_link)
 
@@ -387,8 +362,6 @@ def edit_venue(venue_id):
     "phone": this.phone,
     "website": this.website,
     "facebook_link": this.facebook_link,
-    # "seeking_talent": True,
-    # "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
     "image_link": this.image_link
   }
   form.name.data = venue["name"]
@@ -398,7 +371,6 @@ def edit_venue(venue_id):
   form.state.data = venue["state"]
   form.phone.data = venue["phone"]
   form.facebook_link.data = venue["facebook_link"]
-  #form.website.data= venue["website"]
   # TODO: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
@@ -419,11 +391,6 @@ def edit_venue_submission(venue_id):
     phone = request.form['phone']
     genres = request.form['genres']
     facebook_link = request.form['facebook_link']
-    
-    #"website": request.form['website'],
-    #"seeking_venue": request.form['seeking_venue'],
-    #"seeking_description": request.form['seeking_description'],
-    #"image_link": request.form['image_link']
 
     venue = Venue(id=venue_id, name=name, genres=genres, address=address, city=city, state=state, phone=phone, 
       facebook_link=facebook_link)
@@ -463,13 +430,6 @@ def create_artist_submission():
     state = request.form['state']
     phone = request.form['phone']
     facebook_link = request.form['facebook_link']
-   
-    ''' 
-    website = request.form['website']
-    seeking_venue = request.form['seeking_venue']
-    seeking_description = request.form['seeking_description']
-    image_link = request.form['image_link']
-    '''
     artist = Artist(name=name, genres=genres, city=city, state=state, phone=phone, 
       facebook_link=facebook_link)
 
@@ -499,19 +459,17 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  #shows = Shows.query.all()
-  shows = Shows.query.all()
-  
-
-  # for i in shows:
-  #   data.append({
-  #     "venue_id": i.venue_id,
-  #     "venue_name": Venue.query.filter_by(id=i.venue_id).one().name,
-  #     "artist_id": i.artist_id,
-  #     "artist_name": Artist.query.filter_by(id=i.artist_id).one().name,
-  #     "artist_image_link": i.artist_image_link,
-  #     "start_time": i.start_time
-  #   })
+  shows = Shows.query.options(db.joinedload(Shows.Venue), db.joinedload(Shows.Artist)).all()
+  now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+  data = []
+  for show in shows:
+    data.append({
+      "venue_id": show.venue_id,
+      "venue_name": Venue.query.filter_by(id=show.venue_id).one().name,
+      "artist_id": show.artist_id,
+      "artist_name": Artist.query.filter_by(id=show.artist_id).one().name,
+      "start_time": show.start_time
+    })
   return render_template('pages/shows.html', shows=shows)
 
 @app.route('/shows/create')
