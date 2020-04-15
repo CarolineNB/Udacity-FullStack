@@ -2,8 +2,10 @@ import os
 import random
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, and_
 from flask_cors import CORS
 import random
+import sys
 
 from models import setup_db, Question, Category
 
@@ -67,18 +69,20 @@ def create_app(test_config=None):
   def get_questions():
     questions = Question.query.all()
 
-    if len(questions) == 0:
-      abort(404)
-
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * 10
     end = start + 10
     formatted_questions = [question.format() for question in questions]
+    curr_questions = formatted_questions[start:end]
 
+    if len(curr_questions) == 0:
+      abort(404)
+
+    
     return jsonify({
       'success': True,
-      'questions': formatted_questions[start:end],
-      'total_questions': len(formatted_questions)
+      'questions': curr_questions,
+      'total_questions': len(curr_questions)
     })
 
   '''
@@ -88,23 +92,24 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
+
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
-  def delete_question(question_id):
-    question = Question.query.filter(Question.id == question_id).one()
+  def delete_questions(question_id):
+    question = Question.query.filter_by(id=question_id).first()
+    if question is None:
+      abort(404)
     try:
-      if question == None:
-        abort(404)
-      
       question.delete()
 
       return jsonify({
         'success': True, 
-        'question': question, 
+        'question': question.id, 
         'total_questions': len(Question.query.all())
       })
     except:
       abort(422)
 
+  
   '''
   @TODO: 
   Create an endpoint to POST a new question, 
@@ -149,19 +154,30 @@ def create_app(test_config=None):
   @app.route('/questions', methods=['POST'])
   def search_question():
     try:
-      search_term = request.get_json('searchTerm')
-      results = Question.query.filter(Question.question.islike('%' + search_term + '%'))
+      req = request.get_json()
+      search_term = str(req.get('searchTerm', None))
+      
+      if search_term:
+        results = Question.query.filter(Question.question.ilike('%{}%'.format(search_term)))
 
-      if len(results) == 0:
+      search_results = [question.format() for question in results]
+
+      if(len(search_results) == 0):
         abort(404)
 
+      page = request.args.get('page', 1, type=int)
+      start = (page - 1) * 10
+      end = start + 10
+      search_results = search_results[start:end]
+
       return jsonify({
-        'success': True,
-        'results': [result.format() for result in results],
-        'total_questions': len(results)
+         'success': True,
+         'results': search_results,
+         'total_questions': len(search_results)
       })
     except:
       abort(422)
+
 
   '''
   @TODO: 
@@ -172,20 +188,30 @@ def create_app(test_config=None):
   category to be shown. 
   '''
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
-  def category_questions(category_id):
-    try:
-      cat_questions = Question.query.filter(Question.category == category_id)
-      if len(cat_questions) == 0:
+  def get_questions_categories(category_id):
+    category = Category.query.filter(Category.id == category_id).one_or_none()
+
+    if (category is None):
         abort(404)
-      return jsonify({
-        'success': True,
-        'questions': [question.format() for question in cat_questions],
-        'total_questions': len(cat_questions)
-      })
-    except:
-      abort(422)
+
+    questions = Question.query.filter(Question.category == category_id).all()
+
+    if (len(questions) == 0):
+        abort(404)
+
+    page = request.args.get('page', 1, type=int)
+    start = (page - 1) * 10
+    end = start + 10
+    formatted_questions = [question.format() for question in questions]
+
+    return jsonify({
+      'success': True,
+      'questions': formatted_questions[start:end],
+      'category': category.format()
+    })
 
   '''
+  
   @TODO: 
   Create a POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
@@ -197,34 +223,27 @@ def create_app(test_config=None):
   and shown whether they were correct or not. 
   '''
   @app.route('/quizzes', methods=['POST'])
-  def next_question():
-    try:
-      prev_questions = request.get_json('previousQuestions')
-      category = request.get_json('quiz_category')
+  def quizzes():
+    unasked = []
+    previous_questions = request.get_json()['previous_questions']
 
-      category_questions = Question.query.filter(Question.category == category)
+    if previous_questions:
+        unasked.append(Question.id.notin_(previous_questions))
+        
+    category_id = request.get_json().get('category_id', None)
 
-      if len(category_questions) == 0:
-        abort(404)
+    if category_id:
+        unasked.append(Question.category == int(category_id))
 
-      all_questions = [question.id for question in category_questions]
-      unasked = [question.id for question in all_questions if question not in prev_questions]
+    question = Question.query.filter(and_(*unasked)).order_by(func.random()).first()
 
-      if len(unasked) == 0:
-        abort(404)
 
-      random_question = random.choice(unasked)
-      to_question = Question.query.filter(Question.id == random_question)
+    return jsonify({
+      'success': True,
+      'question': question.format()
+    })
 
-      if to_question is None:
-        abort(404)
 
-      return jsonify({
-        'success': True, 
-        'question': to_question.format()
-      })
-    except:
-      abort(422)
 
   '''
   @TODO: 
@@ -234,9 +253,9 @@ def create_app(test_config=None):
   @app.errorhandler(422)
   def unprocessable(error):
     return jsonify({
-      'sucess': False,
+      'success': False,
       'error': 422,
-      'message': unprocessable
+      'message': "unprocessable"
     }), 422
   
   @app.errorhandler(404)
@@ -246,6 +265,22 @@ def create_app(test_config=None):
       'error': 404,
       'message': "resource not found"
     }), 404
-  return app
 
-    
+  @app.errorhandler(400)
+  def not_found(error):
+    return jsonify({
+      'success': False,
+      'error': 400,
+      'message': "bad request"
+    }), 400
+
+  @app.errorhandler(405)
+  def not_allowed(error):
+    return jsonify({
+      'success': False,
+      'error': 405, 
+      'message': "method not allowed"
+    }), 405
+  
+
+  return app
