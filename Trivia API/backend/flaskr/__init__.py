@@ -169,6 +169,7 @@ def create_app(test_config=None):
       start = (page - 1) * 10
       end = start + 10
       search_results = search_results[start:end]
+      print("results", search_results)
 
       return jsonify({
          'success': True,
@@ -282,5 +283,12 @@ def create_app(test_config=None):
       'message': "method not allowed"
     }), 405
   
+  @app.errorhandler(500)
+  def internal_server(error):
+    return jsonify({
+      'success': False,
+      'error': 500, 
+      'message': "internal error"
+    }), 500
 
   return app

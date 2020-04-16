@@ -96,14 +96,14 @@ class TriviaTestCase(unittest.TestCase):
 
     
     def test_get_questions_by_search_term(self):
-        res = self.client().post('/questions',json={'searchTerm': 'title'})        
+        res = self.client().post('/questions',json={'searchTerm': 'who'})        
         data = json.loads(res.data.decode('utf-8'))
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
     def test_404_get_invalid_search(self):
-        res = self.client().post('/questions',json={'searchTerm': '145678er'})        
+        res = self.client().post('/questions',json={'searchTerm': '--0--'})        
         data = json.loads(res.data.decode('utf-8'))
 
         self.assertEqual(res.status_code, 422)
