@@ -67,22 +67,30 @@ One note before you delve into your tasks: for each endpoint you are expected to
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
 REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
 
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+## Error Handling
+
+Errors are returned in JSON objects in the following format:
 ```
+{
+  'success': False,
+  'error': 404,
+  'message': "resource not found"
+}
+```
+This API will return the following error types when requests fail:
+  - 400
+  - 404
+  - 422
+  - 500
+
 
 ## Endpoints
 
-### GET `'/categories/`
+### GET `/categories`
 
 - General:
-  - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+  - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category.
   - Request Arguments: None
   - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
 - Sample: `http://127.0.0.1:5000/categories`
@@ -95,10 +103,165 @@ DELETE ...
 '6' : "Sports"}
 ```
 
+### GET `/questions`
+
+- General:
+  - Fetches a list of questions paginated for every 10 questions.
+  - Request Arguments: None
+  - Returns: A list of questions with their corresponding category number and amount of total questions.
+- Sample: `http://127.0.0.1:5000/questions` or by page `/questions?page=1`
+```
+"questions": [
+    {
+      "answer": "Maya Angelou",
+      "category": 4,
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "Muhammad Ali",
+      "category": 4,
+      "difficulty": 1,
+      "id": 9,
+      "question": "What boxer's original name is Cassius Clay?"
+    },
+    ...
+    {
+      "answer": "The Palace of Versailles",
+      "category": 3,
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }
+  ],
+  "success": true,
+  "total_questions": 10
+}
+```
+
+### GET `/categories/<int:category_id>/questions`
+
+- General:
+  -Fetch questions based on a category
+-Sample: `http://127.0.0.1:5000/categories/1/questions`
+```
+{
+  "category": {
+    "id": 1, 
+    "type": "Science"
+  }, 
+  "questions": [
+    {
+      "answer": "The Liver", 
+      "category": 1, 
+      "difficulty": 4, 
+      "id": 20, 
+      "question": "What is the heaviest organ in the human body?"
+    }, 
+    {
+      "answer": "Alexander Fleming", 
+      "category": 1, 
+      "difficulty": 3, 
+      "id": 21, 
+      "question": "Who discovered penicillin?"
+    }, 
+    {
+      "answer": "Blood", 
+      "category": 1, 
+      "difficulty": 4, 
+      "id": 22, 
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    }
+  ], 
+  "success": true
+}
+```
+
+### DELETE `/questions/<int:question_id>`
+
+- General:
+  - Deletes a question using a question ID
+  - Request Arguments: None
+  - Returns: Deletes a question using its corresponding id.
+```
+{
+  "question": 1,
+  "success": true,
+  "total_questions": 19
+}
+```
+
+### POST `/create_questions`
+
+- General:
+  - Creates a question given a JSON object with the correct arguments
+  - Request Arguments: JSON object with question, answer text, category, and difficulty score.
+```
+{
+    "question":"This is a question",
+    "answer":"This is an answer",
+    "difficulty":"This is a difficulty level",
+    "category":"This is a category"
+}
+```
+
+### POST `/questions`
+
+- General:
+  - Fetch questions based on a search term
+  - Request Arguments: JSON object with a `searchTerm` object.
+```
+{
+    "searchTerm":"Who"
+}
+```
+  -Returns a list of questions that include the search term in the question.
+ ```
+ [{
+    'id': 12, 
+    'question': 'Who invented Peanut Butter?', 
+    'answer': 'George Washington Carver', 
+    'category': 4, 'difficulty': 2
+  }, 
+  {
+    'id': 21, 
+    'question': 'Who discovered penicillin?',
+    'answer': 'Alexander Fleming',
+    'category': 1,
+    'difficulty': 3
+ }]
+ ```
+ 
+ ### POST `/quizzes`
+ 
+ -General:
+  -Get questions to play the quiz given a category and previous question parameters.
+  -Request Arguments: JSON object with `previous_questions` and `category_id` 
+```
+{
+  'previous_questions': [2, 4],
+  'category_id': 5
+}
+```
+  -Returns: A random question within the given category and that is not one of the previous questions
+```
+{
+  "question":{
+      "answer": "Edward Scissorhands", 
+      "category": 5, 
+      "difficulty": 3, 
+      "id": 6, 
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    },
+  "success": true
+}
+```
+
 ## Testing
 To run the tests, run
 
-
+```
 dropdb trivia_test
 createdb trivia_test
 psql trivia_test < trivia.psql
