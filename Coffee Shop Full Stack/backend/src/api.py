@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+#db_drop_and_create_all()
 
 '''
 @TODO implement endpoint
@@ -29,19 +29,14 @@ db_drop_and_create_all()
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    try:
-        drinks = Drink.query.all()
-        if len(drinks) == 0:
-            abort(404)
-
-        drinks = [drink.short() for drink in drinks]
-
-        return jsonify({
-            'success': True,
-            'drinks': drinks
-        })
-    except Exception:
+    drinks = Drink.query.all()
+    if len(drinks) == 0:
         abort(404)
+
+    return jsonify({
+        'success': True,
+        'drinks': [drink.short() for drink in drinks]
+    }), 200
 
 
 '''
@@ -86,25 +81,20 @@ def get_drink_details(jwt):
 '''
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def add_new_drink(payload):
+def create_drink(payload):
     body = request.get_json()
+
     try:
-        title = body.get('title')
-        recipe_data = body.get('recipe')
-        recipe = json.dumps(recipe_data)
-        drink = Drink(
-            title=title,
-            recipe=recipe
-        )
+        req_recipe = body['recipe']
+        drink = Drink()
+        drink.title = body['title']
+        drink.recipe = json.dumps(req_recipe)
         drink.insert()
 
-        return jsonify({
-            'success': True,
-            'drinks': [drink.long()]
-        }), 200
     except Exception:
-        abort(422)
+        abort(400)
 
+    return jsonify({'success': True, 'drinks': [drink.long()]})
 
 '''
 @TODO implement endpoint
@@ -119,33 +109,29 @@ def add_new_drink(payload):
         the updated drink or appropriate status code indicating
         reason for failure
 '''
-@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def edit_drink(payload, drink_id):
+def edit_drink(payload, id):
+    body = request.get_json()
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+
+    if not drink:
+        abort(404)
+
     try:
-        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
-        if not drink:
-            abort(400)
-        body = request.get_json()
+        req_title = body.get('title')
+        req_recipe = body.get('recipe')
+        if req_title:
+            drink.title = req_title
 
-        title = body.get('title')
-        if title == '':
-            abort(400)
-        drink.title = title
-
-        recipe_data = body.get('recipe')
-        if type(recipe_data) != list:
-            abort(400)
-        drink.recipe = json.dumps(recipe_data)
+        if req_recipe:
+            drink.recipe = json.dumps(body['recipe'])
 
         drink.update()
+    except BaseException:
+        abort(400)
 
-        return jsonify({
-            'success': True,
-            'drinks': [drink.long()]
-        }), 200
-    except Exception:
-        abort(422)
+    return jsonify({'success': True, 'drinks': [drink.long()]}), 200
 
 
 '''
@@ -213,7 +199,7 @@ def bad_request(error):
     return jsonify({
         "success": False,
         "error": 400,
-        "messange": "bad request"
+        "message": "bad request"
     }), 401
 
 
@@ -244,9 +230,9 @@ def internal_server_error(error):
     error handler should conform to general task above
 '''
 @app.errorhandler(AuthError)
-def authentication_error(error):
+def auth_error(error):
     return jsonify({
         "success": False,
         "error": error.status_code,
-        "message": "authentication error"
+        "message": "authorization error"
     }), error.status_code
