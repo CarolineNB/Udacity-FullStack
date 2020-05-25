@@ -138,6 +138,52 @@ class CastingTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
+    def test_patch_actor_producers(self):
+        actor = {
+            'name': 'changename',
+            'gender': 'gender2',
+            'age': 223
+        }
+        res = self.client().patch('/actors/5',
+                                 headers={
+                                     "Authorization": "Bearer {}".format(
+                                         self.producer)
+                                 }, json=actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_patch_actor_director(self):
+        actor = {
+            'name': 'changeNameAgain',
+            'gender': 'gender2',
+            'age': 223
+        }
+        res = self.client().patch('/actors/6',
+                                 headers={
+                                     "Authorization": "Bearer {}".format(
+                                         self.director)
+                                 }, json=actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+    
+    def test_patch_actor_assistant_error(self):
+        actor = {
+            'name': 'changeNameAgain',
+            'gender': 'gender2',
+            'age': 223
+        }
+        res = self.client().patch('/actors/3',
+                                 headers={
+                                     "Authorization": "Bearer {}".format(
+                                         self.assistant)
+                                 }, json=actor)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+
+
     def test_create_movie(self):
         movie = {
             'name': 'this is a name',
