@@ -26,29 +26,36 @@ class Movie(db.Model):
   __tablename__ = 'Movies'
   id = Column(Integer, primary_key=True)
   name = Column(String, nullable=False)
-  date = Column(db.DateTime, nullable=False)
+  date = Column(Integer, nullable=False)
 
   def __init__(self, name, date):
     self.name = name
     self.date = date
 
-  def insert(self):
-        db.session.add(self)
-        db.session.commit()
-  
-  def update(self):
-        db.session.commit()
-
-  def delete(self):
-      db.session.delete(self)
-      db.session.commit()
-
-  def format(self):
+  def long(self):
       return {
-          'id': self.id,
+          'id':self.id,
           'name': self.name,
           'date': self.date
-        }
+      }
+
+  def insert(self):
+    db.session.add(self)
+    db.session.commit()
+  
+  def update(self):
+    db.session.commit()
+
+  def delete(self):
+    db.session.delete(self)
+    db.session.commit()
+
+  def format(self):
+    return {
+        'id': self.id,
+        'name': self.name,
+        'date': self.date
+      }
 
 
 '''
@@ -62,26 +69,35 @@ class Actor(db.Model):
   age = Column(Integer, nullable=False)
   gender = Column(String)
 
-  def __init__(self, name, age, gender=""):
+  def __init__(self, name, age, gender):
     self.name = name
     self.age = age
     self.gender = gender
 
-  def insert(self):
-        db.session.add(self)
-        db.session.commit()
-  
-  def update(self):
-        db.session.commit()
 
-  def delete(self):
-      db.session.delete(self)
-      db.session.commit()
-
-  def format(self):
+  def long(self):
       return {
           'id': self.id,
           'name': self.name,
           'age': self.age,
           'gender': self.gender
-        }
+      }
+
+  def insert(self):
+    db.session.add(self)
+    db.session.commit()
+  
+  def update(self):
+    db.session.commit()
+
+  def delete(self):
+    db.session.delete(self)
+    db.session.commit()
+
+  def format(self):
+    return {
+        'id': self.id,
+        'name': self.name,
+        'age': self.age,
+        'gender': self.gender
+      }

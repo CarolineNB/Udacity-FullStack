@@ -3,14 +3,11 @@ from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
-AUTH0_DOMAIN = 'cb-coffeeshop.auth0.com'####
+AUTH0_DOMAIN = 'cb-capstone.auth0.com'####
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'shop'####
+API_AUDIENCE = 'Casts'####
+
 # AuthError Exception
-'''
-AuthError Exception
-A standardized way to communicate auth failure modes
-'''
 
 
 class AuthError(Exception):
@@ -34,7 +31,6 @@ def get_token_auth_header():
         'error': 401
         }, 401)
 
-
 def check_permissions(permission, payload):
     if "permissions" in payload:
         if permission in payload['permissions']:
@@ -45,7 +41,6 @@ def check_permissions(permission, payload):
         'description': 'Permission Not Found in JWT!',
         'error': 401
     }, 401)
-
 
 def verify_decode_jwt(token):
     # Get public key from Auth0
@@ -114,7 +109,6 @@ def verify_decode_jwt(token):
                 key.',
         'error': 400,
     }, 400)
-
 
 def requires_auth(permission=''):
     def requires_auth_decorator(f):
