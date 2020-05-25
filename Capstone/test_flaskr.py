@@ -35,7 +35,8 @@ class CastingTestCase(unittest.TestCase):
 
     def test_get_actors(self):
         res = self.client().get('/actors',
-                                headers={'Authorization': 'Bearer '+self.assistant})
+                                headers={'Authorization':
+                                         'Bearer '+self.assistant})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -50,7 +51,8 @@ class CastingTestCase(unittest.TestCase):
 
     def test_get_movies(self):
         res = self.client().get('/movies',
-                                headers={'Authorization': 'Bearer '+self.assistant})
+                                headers={'Authorization':
+                                         'Bearer '+self.assistant})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -65,7 +67,8 @@ class CastingTestCase(unittest.TestCase):
 
     def test_delete_actor_director(self):
         res = self.client().delete('/actors/2',
-                                   headers={'Authorization': 'Bearer '+self.director})
+                                   headers={'Authorization':
+                                            'Bearer '+self.director})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -73,7 +76,8 @@ class CastingTestCase(unittest.TestCase):
 
     def test_delete_actor_producer(self):
         res = self.client().delete('/actors/1',
-                                   headers={'Authorization': 'Bearer '+self.producer})
+                                   headers={'Authorization':
+                                            'Bearer '+self.producer})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -81,18 +85,20 @@ class CastingTestCase(unittest.TestCase):
 
     def test_delete_actor_error_assistant(self):
         res = self.client().delete('/actors/4',
-                                   headers={'Authorization': 'Bearer '+self.assistant})
+                                   headers={'Authorization':
+                                            'Bearer '+self.assistant})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
 
     def test_delete_actor_invalid(self):
         res = self.client().delete('/actors/999',
-                                   headers={'Authorization': 'Bearer '+self.director})
+                                   headers={'Authorization':
+                                            'Bearer '+self.director})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-       
+
     def test_create_actor_producers(self):
         actor = {
             'name': 'name2',
@@ -101,7 +107,8 @@ class CastingTestCase(unittest.TestCase):
         }
         res = self.client().post('/actors',
                                  headers={
-                                     "Authorization": "Bearer {}".format(
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.producer)
                                  }, json=actor)
         data = json.loads(res.data)
@@ -116,7 +123,8 @@ class CastingTestCase(unittest.TestCase):
         }
         res = self.client().post('/actors',
                                  headers={
-                                     "Authorization": "Bearer {}".format(
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.director)
                                  }, json=actor)
         data = json.loads(res.data)
@@ -131,7 +139,8 @@ class CastingTestCase(unittest.TestCase):
         }
         res = self.client().post('/actors',
                                  headers={
-                                     "Authorization": "Bearer {}".format(
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.producer)
                                  }, json=actor)
         data = json.loads(res.data)
@@ -145,10 +154,11 @@ class CastingTestCase(unittest.TestCase):
             'age': 223
         }
         res = self.client().patch('/actors/5',
-                                 headers={
-                                     "Authorization": "Bearer {}".format(
+                                  headers={
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.producer)
-                                 }, json=actor)
+                                  }, json=actor)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -160,14 +170,15 @@ class CastingTestCase(unittest.TestCase):
             'age': 223
         }
         res = self.client().patch('/actors/6',
-                                 headers={
-                                     "Authorization": "Bearer {}".format(
+                                  headers={
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.director)
-                                 }, json=actor)
+                                  }, json=actor)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-    
+
     def test_patch_actor_assistant_error(self):
         actor = {
             'name': 'changeNameAgain',
@@ -175,14 +186,14 @@ class CastingTestCase(unittest.TestCase):
             'age': 223
         }
         res = self.client().patch('/actors/3',
-                                 headers={
-                                     "Authorization": "Bearer {}".format(
+                                  headers={
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.assistant)
-                                 }, json=actor)
+                                  }, json=actor)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
-
 
     def test_create_movie(self):
         movie = {
@@ -191,7 +202,8 @@ class CastingTestCase(unittest.TestCase):
         }
         res = self.client().post('/movies',
                                  headers={
-                                     "Authorization": "Bearer {}".format(
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.producer)
                                  }, json=movie)
         data = json.loads(res.data)
@@ -205,7 +217,8 @@ class CastingTestCase(unittest.TestCase):
         }
         res = self.client().post('/movies',
                                  headers={
-                                     "Authorization": "Bearer {}".format(
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.director)
                                  }, json=movie)
         data = json.loads(res.data)
@@ -219,7 +232,8 @@ class CastingTestCase(unittest.TestCase):
         }
         res = self.client().post('/movies',
                                  headers={
-                                     "Authorization": "Bearer {}".format(
+                                     "Authorization":
+                                     "Bearer {}".format(
                                          self.producer)
                                  }, json=movie)
         data = json.loads(res.data)

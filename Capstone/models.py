@@ -7,9 +7,12 @@ database_path = "postgresql://postgres: @localhost:5432/capstone"
 
 db = SQLAlchemy()
 
+
 '''
     binds a flask application and a SQLAlchemy service
 '''
+
+
 def setup_db(app, database_path=database_path):
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -22,82 +25,85 @@ def setup_db(app, database_path=database_path):
 Movie
 Have title and release year
 '''
-class Movie(db.Model):  
-  __tablename__ = 'Movies'
-  id = Column(Integer, primary_key=True)
-  name = Column(String, nullable=False)
-  date = Column(Integer, nullable=False)
 
-  def __init__(self, name, date):
-    self.name = name
-    self.date = date
 
-  def long(self):
-      return {
-          'id':self.id,
-          'name': self.name,
-          'date': self.date
-      }
+class Movie(db.Model):
+    __tablename__ = 'Movies'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    date = Column(Integer, nullable=False)
 
-  def insert(self):
-    db.session.add(self)
-    db.session.commit()
-  
-  def update(self):
-    db.session.commit()
+    def __init__(self, name, date):
+        self.name = name
+        self.date = date
 
-  def delete(self):
-    db.session.delete(self)
-    db.session.commit()
+    def long(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'date': self.date
+        }
 
-  def format(self):
-    return {
-        'id': self.id,
-        'name': self.name,
-        'date': self.date
-      }
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'date': self.date
+          }
 
 
 '''
 Actor
 Has name, age, and gender
 '''
+
+
 class Actor(db.Model):
-  __tablename__= 'Actors'
-  id = Column(Integer, primary_key=True)
-  name = Column(String, nullable=False)
-  age = Column(Integer, nullable=False)
-  gender = Column(String)
+    __tablename__ = 'Actors'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    age = Column(Integer, nullable=False)
+    gender = Column(String)
 
-  def __init__(self, name, age, gender):
-    self.name = name
-    self.age = age
-    self.gender = gender
+    def __init__(self, name, age, gender):
+        self.name = name
+        self.age = age
+        self.gender = gender
 
+    def long(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'age': self.age,
+            'gender': self.gender
+        }
 
-  def long(self):
-      return {
-          'id': self.id,
-          'name': self.name,
-          'age': self.age,
-          'gender': self.gender
-      }
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
 
-  def insert(self):
-    db.session.add(self)
-    db.session.commit()
-  
-  def update(self):
-    db.session.commit()
+    def update(self):
+        db.session.commit()
 
-  def delete(self):
-    db.session.delete(self)
-    db.session.commit()
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
-  def format(self):
-    return {
-        'id': self.id,
-        'name': self.name,
-        'age': self.age,
-        'gender': self.gender
-      }
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'age': self.age,
+            'gender': self.gender
+          }

@@ -11,14 +11,14 @@ from models import setup_db, Movie, Actor
 from auth import AuthError, requires_auth
 
 
-
 def create_app(test_config=None):
-    #create and configure app
+    # create and configure app
     app = Flask(__name__)
     CORS(app)
 
     setup_db(app)
-    #set access control allow
+    # set access control allow
+
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
@@ -26,12 +26,10 @@ def create_app(test_config=None):
           PATCH, DELETE, OPTIONS')
         return response
 
-    
     @app.route('/')
     def get_greeting():
-        greeting = "Hello" 
+        greeting = "Hello"
         return greeting
-
 
     @app.route('/movies', methods=['GET'])
     @requires_auth('get:movies')
@@ -40,26 +38,26 @@ def create_app(test_config=None):
             movies = Movie.query.all()
             if len(movies) == 0:
                 abort(404)
-                
+
             return jsonify({
-                'success': True, 
-                'movies': [movie.long() for movie in movies], 
+                'success': True,
+                'movies': [movie.long() for movie in movies],
                 'total movies': len(movies)
             }), 200
 
         except Exception as error:
             raise error
-    
+
     @app.route('/actors', methods=['GET'])
     @requires_auth('get:actors')
     def get_actors(payload):
         actors = Actor.query.all()
         if len(actors) == 0:
             abort(404)
-        
+
         return jsonify({
-            'success': True, 
-            'actors': [actor.long() for actor in actors], 
+            'success': True,
+            'actors': [actor.long() for actor in actors],
             'total actors': len(actors)
         }), 200
 
@@ -85,13 +83,12 @@ def create_app(test_config=None):
             'total actors': len(Actor.query.all())
         }), 200
 
-
     @app.route('/movies', methods=['POST'])
     @requires_auth('post:movies')
     def add_movies(payload):
         body = request.get_json()
         a_name = body.get('name', None)
-        a_date= body.get('date', None)
+        a_date = body.get('date', None)
 
         new_movie = Movie(
             name=a_name,
@@ -105,7 +102,6 @@ def create_app(test_config=None):
             'created': new_movie.long(),
             'total movies': len(Movie.query.all())
         }), 200
-
 
     @app.route('/actors/<int:actor_id>', methods=['DELETE'])
     @requires_auth('delete:actors')
@@ -123,7 +119,7 @@ def create_app(test_config=None):
 
     @app.route('/actors/<id>', methods=['PATCH'])
     @requires_auth('patch:actors')
-    def edit_actors(payload, id):        
+    def edit_actors(payload, id):
         try:
             body = request.get_json()
             actor = Actor.query.filter(Actor.id == id).one_or_none()
@@ -137,21 +133,19 @@ def create_app(test_config=None):
 
             if a_name:
                 actor.name = a_name
-            
+
             if a_age:
                 actor.age = a_age
-            
+
             if a_gender:
                 actor.gender = a_gender
 
             actor.update()
-            
-            return jsonify({'success':True, 'actor':a_name}), 200
+
+            return jsonify({'success': True, 'actor': a_name}), 200
 
         except Exception:
             abort(400)
-
-
     # Error Handling
 
     @app.errorhandler(422)
@@ -162,7 +156,6 @@ def create_app(test_config=None):
                         "message": "unprocessable"
                         }), 422
 
-
     @app.errorhandler(401)
     def unauthorized(error):
         return jsonify({
@@ -170,7 +163,6 @@ def create_app(test_config=None):
             "error": 401,
             "message": "unauthorized"
         }), 401
-
 
     @app.errorhandler(400)
     def bad_request(error):
@@ -180,7 +172,6 @@ def create_app(test_config=None):
             "message": "bad request"
         }), 401
 
-
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -189,7 +180,6 @@ def create_app(test_config=None):
             "messange": "resource not found"
         }), 404
 
-
     @app.errorhandler(500)
     def internal_server_error(error):
         return jsonify({
@@ -197,7 +187,6 @@ def create_app(test_config=None):
             "error": 500,
             "message": "internal service error"
         }), 500
-
 
     @app.errorhandler(AuthError)
     def auth_error(error):
