@@ -3,14 +3,11 @@ from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-database_path = "postgresql://postgres: @localhost:5432/capstone"
+
+database_path = os.environ.get('DATABASE_URL')
+
 
 db = SQLAlchemy()
-
-
-'''
-    binds a flask application and a SQLAlchemy service
-'''
 
 
 def setup_db(app, database_path=database_path):
@@ -61,12 +58,6 @@ class Movie(db.Model):
             'name': self.name,
             'date': self.date
           }
-
-
-'''
-Actor
-Has name, age, and gender
-'''
 
 
 class Actor(db.Model):

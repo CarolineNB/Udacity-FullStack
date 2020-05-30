@@ -1,5 +1,27 @@
 # Casting Agency
 
+This application models a Casting Agency company that manages movies and actors. It has the ability to host several users such as Casting Assistants, Casting Directors, and Executive Producers. This project is the final project of the Udacity Full Stack Nano-Developer Degree program and exhibits the following skills:
+
+- Coding in Python 3
+- Modeling Data Objects with SQLAlchemy
+  - The data objects of Actors and Movies are modeled with appropriate values
+- Developing a Flask API
+  - Routes perform CRUD operations and RESTful principles are followed throughout the proejct
+- Authentication and Access
+  - Includes different roles that have distinct permissions for actions that are defined in this README
+- Authentication with Auth0
+  - Roles and permssions are configured in Auth0
+- Authentication in Flask
+  - Project includes custom @requires_auth decorators 
+- Role-Based Access Control (RBAC)
+  - Unittests demonstrate role-based access control at specific endpoints
+- Testing Flask Applications
+  - Expected success and error scenarioous are included for each endpoint
+- Deploying Applications
+  - This API is hosted live via Heroku and can be accessed by this [url](https://test-heroku-cb.herokuapp.com/)
+
+All backend code follows PEP8 style guidelines.
+
 ## Getting Started
 
 ### Installing Dependencies
@@ -30,6 +52,10 @@ This will install all of the required packages we selected within the `requireme
 
 - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
 
+
+## Deployment
+This app is currently hosted on heroku: [link](https://test-heroku-cb.herokuapp.com/)
+
 ## Running the server
 
 Within this directory first ensure you are working using your created virtual environment.
@@ -37,7 +63,7 @@ Within this directory first ensure you are working using your created virtual en
 To run the server, execute:
 
 ```bash
-set FLASK_APP=flaskr
+set FLASK_APP=app.py
 set FLASK_ENV=development
 flask run
 ```
@@ -47,6 +73,7 @@ Setting the `FLASK_ENV` variable to `development` will detect file changes and r
 Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
 
 ## Getting Started
+
 This app handles users with multiple roles:
  - _Casting Assistant_
     - Can view actors and movies 
@@ -57,6 +84,9 @@ This app handles users with multiple roles:
  - _Executive Producer_
     - All permissions a Casting Director has and…
     - Add or delete a movie from the database
+
+This application only includes the ```backend```, corresponding authentication JWT headers are located [here](https://github.com/CarolineNB/test-fsnd/blob/master/test.py). You can use it using cURL or Postman to interact with this app.
+
 
 ## Error Handling
 
@@ -83,7 +113,7 @@ To run the tests, run
 dropdb capstone_test
 createdb capstone_test
 psql capstone_test < db.psql
-python test_flaskr.py
+python test.py
 ```
 
 ## Endpoints
