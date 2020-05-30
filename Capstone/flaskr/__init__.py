@@ -1,9 +1,13 @@
 import os
-from flask import Flask, render_template, jsonify, request, abort, redirect
+import random
+from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, and_
 from flask_cors import CORS
+import random
+import sys
+
 from models import setup_db, Movie, Actor
-import os
 from auth import AuthError, requires_auth
 
 
@@ -24,7 +28,7 @@ def create_app(test_config=None):
 
     @app.route('/')
     def get_greeting():
-        greeting = "Hello! Welcome to Casting Agency!"
+        greeting = "Hello"
         return greeting
 
     @app.route('/movies', methods=['GET'])
@@ -193,10 +197,3 @@ def create_app(test_config=None):
         }), error.status_code
 
     return app
-
-
-app = create_app()
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
