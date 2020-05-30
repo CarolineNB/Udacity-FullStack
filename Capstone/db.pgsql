@@ -115,6 +115,12 @@ COPY public."Actors" (id, name, age, gender) FROM stdin;
 3	Jess	29	female
 4	Joe	24	male
 5	Jane	64	female
+6	Riley	44	female
+7	John	12	male
+8	Jose	19	male
+9	Chris	24	male
+10	Ann	65	female
+11	Lia	23	female
 \.
 
 
