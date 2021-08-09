@@ -90,7 +90,7 @@ python-editor==1.0.4
 python-json-logger==0.1.11
 pyttsx3==2.81
 pytz==2019.1
-pywin32==227
+pywin32==301
 pywinpty==0.5.7
 PyYAML==5.3
 pyzmq==18.1.1
